@@ -1,6 +1,7 @@
 import requests, re
 from bs4 import BeautifulSoup
-import bs4
+import bs4,os
+import json
 
 paper_line_reg = re.compile("(^/papers/[0-9]+.[0-9]+$)")
 huggingface_detail_prefix = "https://huggingface.co"
@@ -15,7 +16,7 @@ class Comment:
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
+                          sort_keys=True)
 
 
 class Paper:
@@ -31,7 +32,7 @@ class Paper:
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
+                          sort_keys=True)
 
 
 def get_paper_list():
@@ -111,18 +112,35 @@ def get_paper_detail(paper_id):
     return paper
 
 
-papers_ids = get_paper_list()
+if __name__ == "__main__":
 
-import json
-papers = []
-print(papers_ids)
-for id, name in papers_ids.items():
-    paper = get_paper_detail(id)
-    paper.name = name
-    papers.append(paper)
+    doc_json_file = "docs/paper_list.json"
+    history_ids = set([])
+    paper_data = []
+    if os.path.exists(doc_json_file):
+        for line in open(doc_json_file, "r"):
+            paper_obj = json.loads(line.strip())
+            history_ids.add(paper_obj["id"])
+            paper_data.append(line.strip())
 
-    print(paper.toJSON())
-#
+    papers_ids = get_paper_list()
+    papers = []
+    print(papers_ids)
+    for id, name in papers_ids.items():
+        if id in history_ids:
+            continue
+        paper = get_paper_detail(id)
+        paper.name = name
+        papers.append(paper.toJSON())
+
+    papers_ids = papers + paper_data
+
+    f = open(doc_json_file, 'w')
+    for paper in papers:
+        f.write(paper + "\n")
+
+
+
 # print(paper.id)
 # print(paper.feature_data)
 # for comment in paper.comments:
