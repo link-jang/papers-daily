@@ -133,7 +133,7 @@ if __name__ == "__main__":
         paper.name = name
         papers.append(paper.toJSON())
 
-    papers_ids = papers + paper_data
+    papers = papers + paper_data
 
     f = open(doc_json_file, 'w')
     for paper in papers:
