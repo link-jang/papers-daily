@@ -127,7 +127,7 @@ if __name__ == "__main__":
     papers = []
     print(papers_ids)
     for id, name in papers_ids.items():
-        if paper_id.split("/")[-1] in history_ids:
+        if id.split("/")[-1] in history_ids:
             continue
         paper = get_paper_detail(id)
         paper.name = name
